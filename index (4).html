@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Финансовая система fashion-бренда — кейс для отклика</title>
+<style>
+:root{
+  --bg:#0b0d10; --panel:#12161b; --panel2:#171c22; --line:#26303a; --text:#f3f5f7;
+  --muted:#9aa6b2; --accent:#ff7a1a; --good:#36c98f; --warn:#f1b84b; --bad:#ef6461;
+  --radius:16px;
+}
+body[data-theme="light"]{
+  --bg:#f5f7fa; --panel:#ffffff; --panel2:#f3f6f9; --line:#d9e1ea; --text:#17212b;
+  --muted:#607080; --accent:#ff7a1a; --good:#1f9d68; --warn:#b58317; --bad:#d34b48;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background .2s ease,color .2s ease}
+button,select{font:inherit}
+button{cursor:pointer}
+.theme-toggle{
+  background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px;display:inline-flex;align-items:center;gap:8px
+}
+.theme-toggle .theme-icon{font-size:14px;line-height:1}
+.header{
+  position:sticky;top:0;z-index:20;background:rgba(11,13,16,.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:16px 22px;
+}
+.header-top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;border-radius:10px;background:var(--accent);display:grid;place-items:center;color:#111;font-weight:900}
+.brand h1{font-size:18px;margin:0}
+.brand small{display:block;color:var(--muted);margin-top:3px}
+.filters{display:flex;gap:10px;flex-wrap:wrap}
+select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 12px;outline:none}
+.demo-badge{border:1px solid #5a402c;background:#24180f;color:#ffb477;padding:7px 10px;border-radius:999px;font-size:12px;transition:background .2s ease,border-color .2s ease,color .2s ease}
+body[data-theme="light"] .demo-badge{background:#fff4ea;border-color:#f0bf94;color:#9a4f14}
+body[data-theme="light"] .icon{background:#fff4ea;color:#c5681a}
+body[data-theme="light"] .pill.good{background:#e8f7ef}
+body[data-theme="light"] .pill.warn{background:#fff6df}
+body[data-theme="light"] .pill.bad{background:#fdeeee}
+body[data-theme="light"] .header{background:rgba(245,247,250,.96)}
+body[data-theme="light"] .case-box{background:linear-gradient(180deg,#ffffff,#f3f6f9);border-color:var(--line)}
+body[data-theme="light"] .case-box h2{color:var(--text)}
+body[data-theme="light"] .case-box p{color:var(--muted)}
+body[data-theme="light"] .case-point{background:#ffffff;border-color:var(--line)}
+body[data-theme="light"] .progress{background:#e8edf3}
+body[data-theme="light"] tbody tr:hover td{background:rgba(23,33,43,.03)}
+body[data-theme="light"] .brand h1{color:var(--text)}
+body[data-theme="light"] .brand small{color:var(--muted)}
+body[data-theme="light"] .nav button{color:#556575}
+body[data-theme="light"] .nav button.active{background:#ffffff}
+body[data-theme="light"] .section-title h2{color:var(--text)}
+
+
+.nav{display:flex;gap:8px;overflow:visible;padding-top:14px;flex-wrap:wrap}
+.nav button{
+  white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--muted);
+  padding:9px 12px;border-radius:10px;cursor:pointer
+}
+.nav button.active{background:var(--panel2);color:var(--text);border-color:var(--line)}
+.main{padding:22px;max-width:1600px;margin:0 auto}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(8,minmax(140px,1fr))}
+.kpis-4{grid-template-columns:repeat(4,minmax(180px,1fr))}
+.card.kpi{display:grid;grid-template-rows:minmax(36px,auto) minmax(56px,1fr) auto;min-height:188px;align-items:start}
+.card.kpi .value{display:block;min-width:0;overflow:visible;padding-top:2px;max-width:100%}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(255,255,255,.015)}
+th:first-child, td:first-child{padding-left:14px}
+th:last-child, td:last-child{padding-right:14px}
+.section-title{margin-bottom:14px}
+.section-title h2{font-size:15px}
+
+.card{background:var(--panel);border:1px solid rgba(38,48,58,.9);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;height:100%;transition:background .2s ease,border-color .2s ease}
+.kpi .label{color:var(--muted);font-size:12px;line-height:1.35;min-height:36px;display:flex;align-items:flex-start;justify-content:flex-start}
+.kpi .value{font-size:clamp(16px,1.7vw,22px);font-weight:800;margin:0;white-space:normal;line-height:1.08;align-self:flex-start;max-width:100%}
+.delta{font-size:12px;line-height:1.4;margin-top:auto;padding-top:10px}
+.good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.row2{grid-template-columns:1.7fr 1fr;margin-top:14px}
+.row3{grid-template-columns:1.2fr 1fr 1fr;margin-top:14px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+.section-title h2{font-size:16px;margin:0}
+.section-title span{color:var(--muted);font-size:12px}
+.chart{height:260px;display:flex;align-items:flex-end;gap:10px;padding-top:16px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.bar{width:70%;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#ff944d,#ff6b00)}
+.bar-label{font-size:11px;color:var(--muted);margin-top:8px}
+.legend{display:flex;gap:14px;color:var(--muted);font-size:12px;flex-wrap:wrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--accent)}
+.signal{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(38,48,58,.55);align-items:flex-start}
+.signal:last-child{border-bottom:0}
+.icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:#211912;color:#ff9d57;flex:0 0 auto}
+.signal b{font-size:13px}
+.signal p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+.table-wrap{overflow:auto;border-radius:12px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+th,td{padding:12px 12px;border-bottom:1px solid rgba(38,48,58,.55);text-align:right;white-space:nowrap;vertical-align:middle}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.02em;text-transform:none}
+.pill{padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid rgba(38,48,58,.8)}
+.pill.good{background:#10251d}
+.pill.bad{background:#2a1515}
+.pill.warn{background:#2a2111}
+.progress{height:8px;background:#20262d;border-radius:999px;overflow:hidden}
+.progress > span{display:block;height:100%;background:var(--accent)}
+.tab{display:none}
+.tab.active{display:block}
+.metric-list{display:grid;gap:10px}
+.metric-line{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid rgba(38,48,58,.55)}
+.metric-line:last-child{border-bottom:0}
+.metric-line span{color:var(--muted);font-size:12px}
+.metric-line b{font-size:13px}
+.arch{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch}
+.arch-step{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
+.arch-step:not(:last-child)::after{content:"→";position:absolute;right:-18px;top:50%;color:var(--accent);font-size:22px}
+.arch-step h3{font-size:14px;margin:0 0 8px}
+.arch-step p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.case-box{background:linear-gradient(180deg,#151a20,#101317);border:1px solid var(--line);border-radius:18px;padding:20px}
+.case-box h2{margin:0 0 10px;font-size:20px}
+.case-box p{color:var(--muted);line-height:1.55;font-size:13px}
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.case-point{background:#12171d;border:1px solid var(--line);border-radius:12px;padding:14px}
+.case-point b{display:block;font-size:13px;margin-bottom:6px}
+.case-point span{font-size:12px;color:var(--muted)}
+.footer-note{color:var(--muted);font-size:11px;margin-top:18px;line-height:1.5}
+.soft{color:var(--muted)}
+
+.owner-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+.big-number{font-size:42px;font-weight:900;line-height:1}
+.big-caption{font-size:12px;color:var(--muted);margin-top:8px}
+.decision-card{border-left:3px solid var(--accent)}
+.decision-card h3{font-size:14px;margin:0 0 8px}
+.decision-card p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}
+.target-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.target-step{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px;min-height:126px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.target-step .k{font-size:11px;color:var(--muted)}
+.target-step .v{font-size:clamp(18px,1.8vw,22px);font-weight:800;margin:6px 0;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.waterfall{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:260px;padding-top:18px}
+.wf-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.wf-bar{width:74%;border-radius:8px 8px 2px 2px;background:linear-gradient(180deg,#ff944d,#ff6b00)}
+.wf-bar.alt{background:linear-gradient(180deg,#4d5966,#2b333b)}
+.wf-label{font-size:11px;color:var(--muted);margin-top:8px;text-align:center}
+.logic-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.logic-node{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.logic-node b{display:block;font-size:13px;margin-bottom:6px}
+.logic-node span{font-size:12px;color:var(--muted);line-height:1.45}
+.priority{font-weight:800}
+
+@media(max-width:1200px){
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .kpis-4{grid-template-columns:repeat(4,1fr)}
+  .arch{grid-template-columns:1fr 1fr}.owner-grid{grid-template-columns:1fr}.target-strip{grid-template-columns:repeat(2,1fr)}.logic-flow{grid-template-columns:repeat(2,1fr)}
+  .arch-step::after{display:none}
+}
+@media(max-width:800px){
+  .main{padding:14px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .kpis-4{grid-template-columns:repeat(2,1fr)}
+  .row2,.row3,.case-grid{grid-template-columns:1fr}
+  .chart{height:220px}
+  .arch{grid-template-columns:1fr}.target-strip,.logic-flow{grid-template-columns:1fr}.waterfall{height:220px}
+  .header{padding:12px}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="logo">MG</div>
+      <div>
+        <h1>Финансовая система fashion-бренда</h1>
+        <small>Розница · интернет-магазин · маркетплейсы · производство · запасы · деньги</small>
+      </div>
+    </div>
+
+    <div class="filters">
+      <select id="period">
+        <option>Сентябрь 2026</option>
+        <option>Август 2026</option>
+        <option>3 квартал 2026</option>
+        <option>2026 YTD</option>
+      </select>
+      <select id="weekFilter">
+        <option>Все недели</option>
+        <option>Неделя 1</option>
+        <option>Неделя 2</option>
+        <option>Неделя 3</option>
+        <option>Неделя 4</option>
+      </select>
+      <select id="scope">
+  <option>Все каналы</option>
+  <option>Розница</option>
+  <option>Интернет-магазин</option>
+  <option>Wildberries</option>
+  <option>Ozon</option>
+</select>
+      <select id="category">
+  <option>Все категории</option>
+  <option>Термобельё</option>
+  <option>Трикотаж</option>
+  <option>Базовая одежда</option>
+  <option>Аксессуары</option>
+</select>
+      <select id="collection">
+  <option>Все коллекции</option>
+  <option>Базовая коллекция</option>
+  <option>Осень–зима 2026</option>
+  <option>Новые дропы</option>
+</select>
+      <span class="demo-badge" id="badge">ДЕМО · синтетические данные</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+        <span class="theme-icon" id="themeIcon">☀️</span>
+        <span id="themeLabel">Светлая тема</span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="nav">
+  <button class="active" data-tab="overview">Панель финансового директора</button>
+  <button data-tab="pl">ОПиУ и каналы</button>
+  <button data-tab="cash">Деньги и ДДС</button>
+  <button data-tab="balance">Баланс и капитал</button>
+  <button data-tab="inventory">Запасы и рентабельность</button>
+  <button data-tab="stores">Магазины</button>
+  <button data-tab="production">Производство и закупки</button>
+  <button data-tab="quality">Контроль данных</button>
+</nav>
+</header>
+
+<main class="main">
+<section id="overview" class="tab active">
+  <div class="case-box" style="margin-bottom:14px">
+    <h2>Финансовый контур fashion-бизнеса</h2>
+    <p>2025: <b style="color:var(--text)">450 млн ₽</b> · цель 2026: <b style="color:var(--text)">1,5 млрд ₽</b>. Управленческая система объединяет каналы продаж, запасы, производство, закупки и деньги в одном контуре.</p>
+  </div>
+  <div class="grid kpis">
+    <div class="card kpi"><div class="label">Выручка за период</div><div class="value" data-bind="revenue"></div><div class="delta good">+12,4% к прошлому периоду</div></div>
+    <div class="card kpi"><div class="label">Валовая маржа</div><div class="value" data-bind="grossMargin"></div><div class="delta good">+1,1 п.п.</div></div>
+    <div class="card kpi"><div class="label">Операционная прибыль (EBITDA)</div><div class="value" data-bind="ebitda"></div><div class="delta" data-bind="ebitdaMargin"></div></div>
+    <div class="card kpi"><div class="label">Операционный денежный поток</div><div class="value" data-bind="ocf"></div><div class="delta good">положительный поток</div></div>
+    <div class="card kpi"><div class="label">Запасы</div><div class="value" data-bind="inventoryValue"></div><div class="delta" data-bind="inventoryDays"></div></div>
+    <div class="card kpi"><div class="label">Рентабельность запасов</div><div class="value" data-bind="gmroi"></div><div class="delta good">+0,08</div></div>
+    <div class="card kpi"><div class="label">Оборотный капитал</div><div class="value" data-bind="workingCapital"></div><div class="delta">под контролем</div></div>
+    <div class="card kpi"><div class="label">Годовой темп 2026</div><div class="value" data-bind="runrate"></div><div class="delta good">цель 1,5 млрд ₽</div></div>
+  </div>
+  <div class="grid row2">
+    <div class="card">
+      <div class="section-title"><h2>Выручка по каналам</h2><span data-bind="overviewScope"></span></div>
+      <div class="chart" id="channelChart"></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>Решения руководителю</h2><span>ключевые сигналы</span></div>
+      <div id="cfoSignals"></div>
+    </div>
+  </div>
+  <div class="grid row3">
+    <div class="card">
+      <div class="section-title"><h2>Экономика каналов</h2><span>выручка и маржа</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Канал</th><th>Выручка</th><th>Валовая маржа</th><th>Рентабельность EBITDA</th><th>Решение</th></tr></thead><tbody id="channelEconomicsBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>Оборотный капитал</h2><span>структура</span></div>
+      <div class="metric-list">
+        <div class="metric-line"><span>Запасы</span><b data-bind="wcInventory"></b></div>
+        <div class="metric-line"><span>Дебиторка</span><b data-bind="wcReceivables"></b></div>
+        <div class="metric-line"><span>Кредиторка</span><b data-bind="wcPayables"></b></div>
+        <div class="metric-line"><span>Потребность в капитале</span><b class="warn" data-bind="wcNeed"></b></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>Качество контура</h2><span>сверки</span></div>
+      <div class="metric-list">
+        <div class="metric-line"><span>ОПиУ закрыт</span><b class="good">100%</b></div>
+        <div class="metric-line"><span>Банк ↔ ДДС</span><b class="good">99,9%</b></div>
+        <div class="metric-line"><span>SKU без себестоимости</span><b class="warn" data-bind="skuNoCost"></b></div>
+        <div class="metric-line"><span>Неопознанные операции</span><b class="bad" data-bind="unidentified"></b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pl" class="tab">
+  <div class="grid kpis kpis-4">
+    <div class="card kpi"><div class="label">Выручка</div><div class="value" data-bind="plRevenue"></div></div>
+    <div class="card kpi"><div class="label">Валовая прибыль</div><div class="value" data-bind="grossProfit"></div></div>
+    <div class="card kpi"><div class="label">Коммерческие расходы</div><div class="value" data-bind="sellingExpenses"></div></div>
+    <div class="card kpi"><div class="label">Операционная прибыль (EBITDA)</div><div class="value" data-bind="plEbitda"></div></div>
+  </div>
+  <div class="grid row2">
+    <div class="card">
+      <div class="section-title"><h2>ОПиУ по каналам</h2><span>управленческий разрез</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Канал</th><th>Выручка</th><th>Себестоимость</th><th>Валовая прибыль</th><th>Расходы канала</th><th>Операционная прибыль</th></tr></thead><tbody id="plTableBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>План-факт</h2><span>ключевые отклонения</span></div>
+      <div class="metric-list">
+        <div class="metric-line"><span>Выручка</span><b class="good">+6,2%</b></div>
+        <div class="metric-line"><span>Валовая маржа</span><b class="good">+1,1 п.п.</b></div>
+        <div class="metric-line"><span>ФОТ</span><b class="warn">+3,8%</b></div>
+        <div class="metric-line"><span>Маркетинг</span><b class="warn">+5,4%</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cash" class="tab">
+  <div class="grid row2">
+    <div class="card"><div class="section-title"><h2>Прогноз ДДС на 13 недель</h2><span data-bind="cashSubtitle"></span></div><div class="chart" id="cashChart"></div></div>
+    <div class="card"><div class="section-title"><h2>Денежные риски</h2><span>30 дней</span></div>
+      <div class="metric-list">
+        <div class="metric-line"><span>Минимальный остаток</span><b data-bind="minCash"></b></div>
+        <div class="metric-line"><span>Порог безопасности</span><b data-bind="safetyCash"></b></div>
+        <div class="metric-line"><span>Платежи поставщикам</span><b data-bind="supplierPayments"></b></div>
+        <div class="metric-line"><span>Кассовый разрыв</span><b class="good" data-bind="cashGap"></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="grid row2">
+    <div class="card"><div class="section-title"><h2>Приход · расход · чистый денежный поток</h2><span>водопад</span></div><div class="waterfall" id="cashWaterfall"></div></div>
+    <div class="card"><div class="section-title"><h2>Структура денежного потока</h2><span>по статьям</span></div><div class="table-wrap"><table><thead><tr><th>Статья</th><th>Сумма</th><th>Тип</th></tr></thead><tbody id="cashBreakdownBody"></tbody></table></div></div>
+  </div>
+</section>
+
+<section id="balance" class="tab">
+  <div class="grid kpis kpis-4">
+    <div class="card kpi"><div class="label">Активы</div><div class="value" data-bind="assets"></div></div>
+    <div class="card kpi"><div class="label">Деньги</div><div class="value" data-bind="cashBalance"></div></div>
+    <div class="card kpi"><div class="label">Запасы</div><div class="value" data-bind="balanceInventory"></div></div>
+    <div class="card kpi"><div class="label">Чистый долг</div><div class="value" data-bind="netDebt"></div></div>
+  </div>
+  <div class="grid row2">
+    <div class="card"><div class="section-title"><h2>Управленческий баланс</h2><span>структура активов и обязательств</span></div><div class="table-wrap"><table><thead><tr><th>Статья</th><th>Сумма</th><th>Доля</th></tr></thead><tbody id="balanceTableBody"></tbody></table></div></div>
+    <div class="card"><div class="section-title"><h2>Денежный цикл</h2><span>дни</span></div><div class="metric-list">
+      <div class="metric-line"><span>Запасы, дней</span><b data-bind="dio"></b></div>
+      <div class="metric-line"><span>Дебиторка, дней</span><b data-bind="dso"></b></div>
+      <div class="metric-line"><span>Кредиторка, дней</span><b data-bind="dpo"></b></div>
+      <div class="metric-line"><span>Денежный цикл</span><b class="warn" data-bind="ccc"></b></div>
+    </div></div>
+  </div>
+</section>
+
+<section id="inventory" class="tab">
+  <div class="grid row2">
+    <div class="card"><div class="section-title"><h2>ABC-анализ</h2><span>вклад в оборот и прибыль</span></div><div class="table-wrap"><table><thead><tr><th>Класс</th><th>Артикулы</th><th>Доля выручки</th><th>Маржа</th><th>Рентабельность запасов</th><th>Действие</th></tr></thead><tbody id="abcTableBody"></tbody></table></div></div>
+    <div class="card"><div class="section-title"><h2>Состояние запасов</h2><span>цель 30–45 дней</span></div><div class="metric-list" id="stockHealthList"></div></div>
+  </div>
+  <div class="grid row3">
+    <div class="card"><div class="section-title"><h2>Риск отсутствия товара</h2><span>14 дней</span></div><div class="metric-list"><div class="metric-line"><span>SKU под риском</span><b class="bad" data-bind="oosSku"></b></div><div class="metric-line"><span>Потерянная выручка</span><b data-bind="oosLost"></b></div></div></div>
+    <div class="card"><div class="section-title"><h2>Избыточный запас</h2><span>&gt;60 дней</span></div><div class="metric-list"><div class="metric-line"><span>Заморожено</span><b data-bind="overstockFrozen"></b></div><div class="metric-line"><span>SKU</span><b class="warn" data-bind="overstockSku"></b></div></div></div>
+    <div class="card"><div class="section-title"><h2>Потенциал высвобождения</h2><span>денежные средства</span></div><div class="metric-list"><div class="metric-line"><span>Сумма</span><b class="good" data-bind="cashRelease"></b></div><div class="metric-line"><span>Горизонт</span><b>30–60 дней</b></div></div></div>
+  </div>
+</section>
+
+<section id="stores" class="tab">
+  <div class="grid kpis kpis-4">
+    <div class="card kpi"><div class="label">Выручка розницы</div><div class="value" data-bind="retailRevenue"></div></div>
+    <div class="card kpi"><div class="label">Операционная прибыль розницы</div><div class="value" data-bind="retailEbitda"></div></div>
+    <div class="card kpi"><div class="label">Средняя выручка / магазин</div><div class="value" data-bind="avgStoreRevenue"></div></div>
+    <div class="card kpi"><div class="label">Сопоставимые продажи</div><div class="value">+8,4%</div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="section-title"><h2>Экономика магазинов</h2><span>управленческий ОПиУ</span></div><div class="table-wrap"><table><thead><tr><th>Магазин</th><th>Выручка</th><th>Валовая маржа</th><th>Аренда</th><th>ФОТ</th><th>Операционная прибыль</th><th>Статус</th></tr></thead><tbody id="storesTableBody"></tbody></table></div></div>
+</section>
+
+<section id="production" class="tab">
+  <div class="grid kpis kpis-4">
+    <div class="card kpi"><div class="label">Заказы в производстве</div><div class="value" data-bind="productionOrders"></div></div>
+    <div class="card kpi"><div class="label">Россия</div><div class="value" data-bind="ruProduction"></div></div>
+    <div class="card kpi"><div class="label">Китай</div><div class="value" data-bind="cnProduction"></div></div>
+    <div class="card kpi"><div class="label">В пути</div><div class="value" data-bind="inTransit"></div></div>
+  </div>
+  <div class="grid row2">
+    <div class="card"><div class="section-title"><h2>Производство и закупки</h2><span>сроки и деньги</span></div><div class="table-wrap"><table><thead><tr><th>Источник</th><th>Заказ</th><th>Срок поставки</th><th>Предоплата</th><th>В пути</th><th>Риск</th></tr></thead><tbody id="productionTableBody"></tbody></table></div></div>
+    <div class="card"><div class="section-title"><h2>Рекомендации</h2><span>по оборотному капиталу</span></div><div id="productionSignals"></div></div>
+  </div>
+</section>
+
+<section id="quality" class="tab">
+  <div class="case-box">
+    <h2>Контроль качества данных</h2>
+    <p>Система должна связывать 1С УНФ, e-commerce, розницу, Wildberries, Ozon, банки, производство и закупки в единую проверяемую модель.</p>
+    <div class="case-grid">
+      <div class="case-point"><b>ОПиУ ↔ 1С УНФ</b><span>сверка выручки, себестоимости и расходов.</span></div>
+      <div class="case-point"><b>ДДС ↔ банки</b><span>остатки и движение денежных средств.</span></div>
+      <div class="case-point"><b>Продажи ↔ запасы</b><span>остатки по складам, магазинам и маркетплейсам.</span></div>
+      <div class="case-point"><b>SKU ↔ себестоимость</b><span>контроль корректной себестоимости по каждой модели.</span></div>
+      <div class="case-point"><b>Производство ↔ поставки</b><span>PO, предоплаты, сроки и фактические приходы.</span></div>
+      <div class="case-point"><b>Каналы ↔ экономика</b><span>единые правила расчета маржинальности по каналам.</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const tabs=document.querySelectorAll('.nav button');
+tabs.forEach(btn=>btn.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(btn.dataset.tab).classList.add('active');
+}));
+
+const themeToggle=document.getElementById('themeToggle');
+const themeLabel=document.getElementById('themeLabel');
+const themeIcon=document.getElementById('themeIcon');
+
+function applyTheme(theme){
+  document.body.setAttribute('data-theme', theme);
+  if(theme==='light'){
+    themeLabel.textContent='Тёмная тема';
+    themeIcon.textContent='🌙';
+  }else{
+    themeLabel.textContent='Светлая тема';
+    themeIcon.textContent='☀️';
+  }
+  try{ localStorage.setItem('embody_demo_theme', theme); }catch(e){}
+}
+
+let savedTheme='dark';
+try{ savedTheme=localStorage.getItem('embody_demo_theme') || 'dark'; }catch(e){}
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', ()=>{
+  const next=document.body.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+  applyTheme(next);
+});
+
+function fmtMoney(n,d=1){return `${n.toFixed(d).replace('.',',')} млн\u00A0₽`}
+function fmtPct(n,d=1){return `${n.toFixed(d).replace('.',',')}%`}
+function fmtRatio(n){return n.toFixed(2).replace('.',',')}
+function fmtNum(n){return Math.round(n).toLocaleString('ru-RU')}
+function bindText(k,v){document.querySelectorAll(`[data-bind="${k}"]`).forEach(e=>e.textContent=v)}
+function pill(t,c){return `<span class="pill ${c}">${t}</span>`}
+function bars(id,labels,vals){
+  const el=document.getElementById(id); if(!el)return;
+  const max=Math.max(...vals)*1.08;
+  el.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar" style="height:${Math.max(8,v/max*100)}%"></div><div class="bar-label">${labels[i]}</div></div>`).join('');
+}
+
+const periodData={
+  'Сентябрь 2026':{rev:145,gm:52,ebitda:18,ocf:14,inv:61,gmroi:.88,cash:[28,26,24,22,23,27,31,34],wc:42},
+  'Август 2026':{rev:126,gm:50,ebitda:14,ocf:11,inv:58,gmroi:.79,cash:[25,23,21,19,20,23,27,30],wc:39},
+  '3 квартал 2026':{rev:401,gm:51,ebitda:17,ocf:37,inv:60,gmroi:.84,cash:[30,28,25,23,24,29,33,36],wc:41},
+  '2026 YTD':{rev:998,gm:50,ebitda:16,ocf:92,inv:59,gmroi:.82,cash:[33,31,29,27,28,31,35,39],wc:40}
+};
+const channelShares={'Розница':.28,'Интернет-магазин':.22,'Wildberries':.31,'Ozon':.19};
+const scopeFactor={'Все каналы':1,'Розница':.28,'Интернет-магазин':.22,'Wildberries':.31,'Ozon':.19};
+const categoryFactor={'Все категории':1,'Термобельё':.36,'Трикотаж':.28,'Базовая одежда':.24,'Аксессуары':.12};
+const collectionFactor={'Все коллекции':1,'Базовая коллекция':.55,'Осень–зима 2026':.31,'Новые дропы':.14};
+
+function getState(){
+  const period=document.getElementById('period').value;
+  const scope=document.getElementById('scope').value;
+  const category=document.getElementById('category').value;
+  const collection=document.getElementById('collection').value;
+  const b=periodData[period];
+  const f=scopeFactor[scope]*categoryFactor[category]*collectionFactor[collection];
+  const rev=b.rev*f;
+  const gm=b.gm+(scope==='Розница'?3:scope==='Wildberries'?-2:0);
+  const ebitda=b.ebitda+(scope==='Интернет-магазин'?2:scope==='Розница'?-1:0);
+  const inv=b.inv*categoryFactor[category]*collectionFactor[collection]*(scope==='Все каналы'?1:.72);
+  return {period,scope,category,collection,rev,gm,ebitda,ocf:b.ocf*f,inv,gmroi:b.gmroi,cash:b.cash.map(x=>x*Math.max(.35,f)),wc:b.wc*f};
+}
+
+function renderChannels(s){
+  const vals=Object.entries(channelShares).map(([k,sh])=>s.rev*sh);
+  bars('channelChart',Object.keys(channelShares),vals);
+  document.getElementById('channelEconomicsBody').innerHTML=Object.entries(channelShares).map(([k,sh])=>{
+    const r=s.rev*sh, gm=s.gm+(k==='Розница'?3:k==='Wildberries'?-2:0), em=s.ebitda+(k==='Интернет-магазин'?2:k==='Розница'?-1:0);
+    const d=em>18?['масштабировать','good']:em<14?['пересмотреть','warn']:['норма','good'];
+    return `<tr><td>${k}</td><td>${fmtMoney(r)}</td><td>${fmtPct(gm)}</td><td>${fmtPct(em)}</td><td>${pill(d[0],d[1])}</td></tr>`;
+  }).join('');
+}
+function renderPl(s){
+  document.getElementById('plTableBody').innerHTML=Object.entries(channelShares).map(([k,sh])=>{
+    const r=s.rev*sh,cogs=r*(1-s.gm/100),gp=r-cogs,exp=r*(k==='Розница'?.22:k==='Интернет-магазин'?.15:.18),e=gp-exp;
+    return `<tr><td>${k}</td><td>${fmtMoney(r)}</td><td>${fmtMoney(cogs)}</td><td>${fmtMoney(gp)}</td><td>${fmtMoney(exp)}</td><td>${fmtMoney(e)}</td></tr>`;
+  }).join('');
+}
+function renderCash(s){
+  bars('cashChart',['Нед. 1','Нед. 2','Нед. 3','Нед. 4','Нед. 5','Нед. 6','Нед. 7','Нед. 8'],s.cash);
+  const inflow=s.rev*.72,supplier=s.rev*.25,payroll=s.rev*.10,rent=s.rev*.06,marketing=s.rev*.08,other=s.rev*.07,net=inflow-supplier-payroll-rent-marketing-other;
+  const blocks=[['Приход',inflow,false],['Поставщики',supplier,true],['ФОТ',payroll,true],['Аренда',rent,true],['Маркетинг',marketing,true],['ЧДП',Math.abs(net),false]];
+  const max=Math.max(...blocks.map(x=>x[1]));
+  document.getElementById('cashWaterfall').innerHTML=blocks.map(x=>`<div class="wf-col"><div class="wf-bar ${x[2]?'alt':''}" style="height:${Math.max(12,x[1]/max*100)}%"></div><div class="wf-label">${x[0]}<br><b>${fmtMoney(x[1])}</b></div></div>`).join('');
+  document.getElementById('cashBreakdownBody').innerHTML=[['Поступления от клиентов',inflow,'приход'],['Поставщики',-supplier,'расход'],['ФОТ',-payroll,'расход'],['Аренда',-rent,'расход'],['Маркетинг',-marketing,'расход'],['Прочие расходы',-other,'расход'],['Чистый денежный поток',net,'итог']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]<0?'−':''}${fmtMoney(Math.abs(r[1]))}</td><td>${r[2]}</td></tr>`).join('');
+}
+function renderBalance(s){
+  const assets=s.rev*.82,cash=s.rev*.18,inv=s.inv,receiv=s.rev*.11,fixed=s.rev*.16,debt=s.rev*.19,pay=s.rev*.14;
+  bindText('assets',fmtMoney(assets));bindText('cashBalance',fmtMoney(cash));bindText('balanceInventory',fmtMoney(inv));bindText('netDebt',fmtMoney(debt-cash));
+  document.getElementById('balanceTableBody').innerHTML=[['Деньги',cash],['Запасы',inv],['Дебиторка',receiv],['Основные средства',fixed],['Кредиторка',-pay],['Долг',-debt]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]<0?'−':''}${fmtMoney(Math.abs(r[1]))}</td><td>${fmtPct(Math.abs(r[1])/assets*100)}</td></tr>`).join('');
+}
+function renderInventory(s){
+  document.getElementById('abcTableBody').innerHTML=[['A',34,65,s.gm+2,s.gmroi+.18,'масштабировать'],['B',48,25,s.gm-2,s.gmroi-.08,'контроль'],['C',76,10,s.gm-7,Math.max(.22,s.gmroi-.4),'очистка запасов']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${fmtPct(r[3])}</td><td>${fmtRatio(r[4])}</td><td>${r[5]}</td></tr>`).join('');
+  document.getElementById('stockHealthList').innerHTML=[['Базовая коллекция',34],['Осень–зима 2026',42],['Новые дропы',24],['Медленно оборачиваемые',78]].map(x=>`<div><div class="metric-line"><span>${x[0]}</span><b>${x[1]} дней</b></div><div class="progress"><span style="width:${Math.min(95,x[1])}%"></span></div></div>`).join('');
+}
+function renderStores(s){
+  const retail=s.rev*.28;
+  bindText('retailRevenue',fmtMoney(retail));bindText('retailEbitda',fmtMoney(retail*.16));bindText('avgStoreRevenue',fmtMoney(retail/6));
+  document.getElementById('storesTableBody').innerHTML=[['Казань Центр',retail*.23,56,9,12,18,'сильный'],['Казань Молл',retail*.20,54,11,13,14,'норма'],['Москва 1',retail*.21,58,15,14,12,'контроль'],['СПб 1',retail*.18,55,14,13,11,'контроль'],['Другие',retail*.18,52,12,13,9,'пересмотреть']].map(r=>`<tr><td>${r[0]}</td><td>${fmtMoney(r[1])}</td><td>${r[2]}%</td><td>${r[3]}%</td><td>${r[4]}%</td><td>${r[5]}%</td><td>${r[6]}</td></tr>`).join('');
+}
+function renderProduction(s){
+  const po=s.rev*.24;
+  bindText('productionOrders',fmtMoney(po));bindText('ruProduction',fmtMoney(po*.42));bindText('cnProduction',fmtMoney(po*.58));bindText('inTransit',fmtMoney(po*.37));
+  document.getElementById('productionTableBody').innerHTML=[['Россия',po*.42,'18–25 дней','30%',fmtMoney(po*.11),'низкий'],['Китай',po*.58,'45–65 дней','50%',fmtMoney(po*.26),'средний']].map(r=>`<tr><td>${r[0]}</td><td>${fmtMoney(r[1])}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('');
+  document.getElementById('productionSignals').innerHTML=`<div class="signal"><div class="icon">1</div><div><b>Пересмотреть предоплаты по Китаю</b><p>Высокая доля предоплаты увеличивает потребность в оборотном капитале.</p></div></div><div class="signal"><div class="icon">2</div><div><b>Ускорить базовые модели в РФ</b><p>Локальное производство использовать для быстрых дозакупок и снижения риска отсутствия товара.</p></div></div><div class="signal"><div class="icon">3</div><div><b>Синхронизировать заказы поставщикам и прогноз продаж</b><p>Новые заказы открывать только при подтвержденной потребности и целевой рентабельности запасов.</p></div></div>`;
+}
+function renderSignals(s){
+  document.getElementById('cfoSignals').innerHTML=`<div class="signal"><div class="icon">₽</div><div><b>${fmtMoney(s.rev*.045)} можно высвободить из запасов</b><p>За счет медленно оборачиваемых товаров и переноса части закупок без риска для базового ассортимента.</p></div></div><div class="signal"><div class="icon">!</div><div><b>Маржа розницы ниже интернет-магазина</b><p>Проверить аренду, ФОТ и эффективность отдельных магазинов.</p></div></div><div class="signal"><div class="icon">→</div><div><b>Китай увеличивает денежный цикл</b><p>Учитывать предоплату и срок производства в 13-недельном прогнозе ДДС.</p></div></div>`;
+}
+function update(){
+  const s=getState();
+  bindText('revenue',fmtMoney(s.rev));bindText('grossMargin',fmtPct(s.gm));bindText('ebitda',fmtMoney(s.rev*s.ebitda/100));bindText('ebitdaMargin',fmtPct(s.ebitda));bindText('ocf',fmtMoney(s.ocf));bindText('inventoryValue',fmtMoney(s.inv));bindText('inventoryDays',`${Math.round(36+s.inv/20)} дней`);bindText('gmroi',fmtRatio(s.gmroi));bindText('workingCapital',fmtMoney(s.wc));bindText('runrate',fmtMoney(s.rev*(s.period==='Сентябрь 2026'||s.period==='Август 2026'?12:3)));bindText('overviewScope',`${s.scope} · ${s.category} · ${s.collection}`);
+  bindText('wcInventory',fmtMoney(s.inv));bindText('wcReceivables',fmtMoney(s.rev*.11));bindText('wcPayables',fmtMoney(s.rev*.14));bindText('wcNeed',fmtMoney(s.wc));bindText('skuNoCost',fmtNum(Math.max(2,Math.round(s.rev/40))));bindText('unidentified',fmtMoney(s.rev*.001));
+  bindText('plRevenue',fmtMoney(s.rev));bindText('grossProfit',fmtMoney(s.rev*s.gm/100));bindText('sellingExpenses',fmtMoney(s.rev*.18));bindText('plEbitda',fmtMoney(s.rev*s.ebitda/100));
+  bindText('cashSubtitle',`${s.period} · ${s.scope}`);bindText('minCash',fmtMoney(Math.min(...s.cash)));bindText('safetyCash',fmtMoney(s.rev*.06));bindText('supplierPayments',fmtMoney(s.rev*.25));bindText('cashGap',Math.min(...s.cash)<s.rev*.06?'под риском':'не прогнозируется');
+  bindText('dio','42 дня');bindText('dso','9 дней');bindText('dpo','28 дней');bindText('ccc','23 дня');
+  bindText('oosSku','11');bindText('oosLost',fmtMoney(s.rev*.035));bindText('overstockFrozen',fmtMoney(s.rev*.068));bindText('overstockSku','27');bindText('cashRelease',fmtMoney(s.rev*.045));
+  renderChannels(s);renderPl(s);renderCash(s);renderBalance(s);renderInventory(s);renderStores(s);renderProduction(s);renderSignals(s);
+}
+document.querySelectorAll('select').forEach(x=>x.addEventListener('change',update));
+update();
+</script>
+</body>
+</html>
